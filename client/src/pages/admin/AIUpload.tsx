@@ -63,10 +63,15 @@ export default function AIUpload() {
   }
 
   // ── Upload step ───────────────────────────────────────────────────────────────
+  const isValidFile = (file: File) =>
+    file.type === 'application/pdf' ||
+    file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+    file.name.match(/\.(pdf|docx|doc)$/i);
+
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file?.type === 'application/pdf') setPdfFile(file);
+    if (file && isValidFile(file)) setPdfFile(file);
   }, []);
 
   async function handleProcess() {
@@ -310,8 +315,8 @@ export default function AIUpload() {
                 className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition
                   ${pdfFile ? 'border-success-500 bg-success-50' : 'border-gray-300 bg-gray-50 hover:border-primary-400 hover:bg-primary-50'}`}
               >
-                <input ref={fileRef} type="file" accept=".pdf" className="hidden"
-                  onChange={e => { const f = e.target.files?.[0]; if (f) setPdfFile(f); }} />
+                <input ref={fileRef} type="file" accept=".pdf,.docx,.doc" className="hidden"
+                  onChange={e => { const f = e.target.files?.[0]; if (f && isValidFile(f)) setPdfFile(f); }} />
                 {pdfFile ? (
                   <>
                     <div className="text-4xl mb-3">✅</div>
@@ -322,8 +327,8 @@ export default function AIUpload() {
                 ) : (
                   <>
                     <div className="text-5xl mb-4">📄</div>
-                    <p className="font-semibold text-gray-700">Drop PDF here or click to browse</p>
-                    <p className="text-sm text-gray-400 mt-1">Supports large PDFs — will be split automatically if needed</p>
+                    <p className="font-semibold text-gray-700">Drop PDF or DOCX here or click to browse</p>
+                    <p className="text-sm text-gray-400 mt-1">Supports .pdf, .docx — text extracted automatically, no API needed</p>
                   </>
                 )}
               </div>
