@@ -19,6 +19,7 @@ export default function TakeTest() {
   const [submitting, setSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [showPanel, setShowPanel] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
 
   const questionStartTime = useRef<number>(Date.now());
   const timerRef = useRef<ReturnType<typeof setInterval>>();
@@ -99,6 +100,7 @@ export default function TakeTest() {
   }
 
   function navigate_(idx: number) {
+    setShowExplanation(false);
     questionStartTime.current = Date.now();
     setCurrentIdx(idx);
     setShowPanel(false);
@@ -216,6 +218,11 @@ export default function TakeTest() {
               <button onClick={toggleMark} className={`btn-sm btn ${resp?.marked_for_review ? 'bg-warning-500 text-white hover:bg-warning-600' : 'btn-secondary'}`}>
                 🔖 {resp?.marked_for_review ? 'Unmark' : 'Mark for Review'}
               </button>
+              {(q.explanation || q.correct_answer) && (
+                <button onClick={() => setShowExplanation(true)} className="btn-secondary btn-sm text-primary-600">
+                  💡 Explanation
+                </button>
+              )}
               {resp?.selected_answer && (
                 <button onClick={clearAnswer} className="btn-secondary btn-sm">✕ Clear</button>
               )}
@@ -266,6 +273,34 @@ export default function TakeTest() {
           </div>
         </div>
       </div>
+
+      {/* Explanation modal */}
+      {showExplanation && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowExplanation(false)}>
+          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-bold text-gray-900">Answer &amp; Explanation</h2>
+              <button onClick={() => setShowExplanation(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+            </div>
+            {q.correct_answer && (
+              <div className="mb-3 flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-600">Correct Answer:</span>
+                <span className="w-7 h-7 rounded-full bg-success-500 text-white flex items-center justify-center text-xs font-bold">{q.correct_answer}</span>
+                <span className="text-sm text-success-700 font-medium">
+                  {q[`option_${q.correct_answer.toLowerCase()}` as keyof Question] as string}
+                </span>
+              </div>
+            )}
+            {q.explanation ? (
+              <div className="bg-primary-50 border border-primary-100 rounded-lg p-3 text-sm text-primary-800">
+                {q.explanation}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400 italic">No explanation available for this question.</p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Confirm submit modal */}
       {showConfirm && (

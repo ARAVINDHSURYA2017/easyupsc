@@ -468,27 +468,6 @@ export default function AIUpload() {
                 onChange={e => updateQuestion(currentIdx, { explanation: e.target.value })} />
             </div>
 
-            {/* Option-wise explanations */}
-            <div className="card">
-              <label className="label mb-3">Option-wise Explanations</label>
-              <div className="space-y-3">
-                {(['A', 'B', 'C', 'D'] as const).map(key => {
-                  const isCorrect = q.correct_answer === key;
-                  return (
-                    <div key={key}>
-                      <label className="text-xs font-semibold mb-1 flex items-center gap-2">
-                        <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${isCorrect ? 'bg-success-500 text-white' : 'bg-gray-200 text-gray-600'}`}>{key}</span>
-                        {isCorrect ? 'Why correct' : 'Why incorrect'}
-                      </label>
-                      <textarea rows={2} className="input resize-none text-sm"
-                        value={q.option_wise_explanation?.[key] || ''}
-                        onChange={e => updateOwExplanation(currentIdx, key, e.target.value)} />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
             {/* Approve / Reject */}
             <div className="card flex gap-3 sticky bottom-0 bg-white border-t border-gray-100">
               <button onClick={() => setStatus(currentIdx, 'rejected')}

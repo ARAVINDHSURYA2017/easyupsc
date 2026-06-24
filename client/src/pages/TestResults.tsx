@@ -8,6 +8,15 @@ export default function TestResults() {
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const [filter, setFilter] = useState<'all' | 'correct' | 'wrong' | 'unattempted'>('all');
+  const [openExplanations, setOpenExplanations] = useState<Set<number>>(new Set());
+
+  function toggleExplanation(id: number) {
+    setOpenExplanations(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
 
   useEffect(() => {
     attemptsApi.results(Number(attemptId)).then(r => setData(r.data)).finally(() => setLoading(false));
@@ -96,16 +105,24 @@ export default function TestResults() {
                       <div key={opt.key} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${isCorrect ? 'bg-success-50 text-success-800 font-medium' : isSelected && !isCorrect ? 'bg-danger-50 text-danger-700' : 'text-gray-600'}`}>
                         <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${isCorrect ? 'bg-success-500 text-white' : isSelected ? 'bg-danger-500 text-white' : 'bg-gray-100 text-gray-500'}`}>{opt.key}</span>
                         <span>{opt.text}</span>
-                        {isCorrect && <span className="ml-auto text-success-600 text-xs">✓ Correct</span>}
-                        {isSelected && !isCorrect && <span className="ml-auto text-danger-600 text-xs">Your answer</span>}
                       </div>
                     );
                   })}
                 </div>
               )}
               {q.explanation && (
-                <div className="bg-primary-50 border border-primary-100 rounded-lg p-3 text-sm text-primary-800">
-                  <span className="font-semibold">Explanation: </span>{q.explanation}
+                <div>
+                  <button
+                    onClick={() => toggleExplanation(q.id)}
+                    className="text-primary-600 text-sm font-medium hover:underline mt-1"
+                  >
+                    {openExplanations.has(q.id) ? '▲ Hide Explanation' : '▼ View Explanation'}
+                  </button>
+                  {openExplanations.has(q.id) && (
+                    <div className="mt-2 bg-primary-50 border border-primary-100 rounded-lg p-3 text-sm text-primary-800">
+                      {q.explanation}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

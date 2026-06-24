@@ -142,7 +142,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 
     const questions = await pool.query(`
       SELECT q.id, q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
-             q.question_type, q.difficulty_level, tq.marks, tq.order_num
+             q.correct_answer, q.explanation, q.question_type, q.difficulty_level, tq.marks, tq.order_num
       FROM test_questions tq
       JOIN question_bank q ON tq.question_id = q.id
       WHERE tq.test_id = $1
