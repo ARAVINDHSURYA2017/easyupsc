@@ -15,9 +15,14 @@ export default function ManageTests() {
   }
 
   async function toggleStatus(test: Test) {
-    if (test.status === 'published') await adminApi.unpublishTest(test.id);
-    else await adminApi.publishTest(test.id).catch(e => alert(e.response?.data?.error || 'Failed'));
-    load();
+    try {
+      if (test.status === 'published') await adminApi.unpublishTest(test.id);
+      else await adminApi.publishTest(test.id);
+      load();
+    } catch (e: any) {
+      const msg = e.response?.data?.error || e.message || 'Request failed';
+      alert('Error: ' + msg);
+    }
   }
 
   async function deleteTest(id: number) {
