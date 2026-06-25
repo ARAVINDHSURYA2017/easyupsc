@@ -286,15 +286,19 @@ router.delete('/tests/:id', async (req, res) => {
 });
 
 router.put('/tests/:id/publish', async (req, res) => {
-  const count = Number((await pool.query('SELECT COUNT(*) as c FROM test_questions WHERE test_id = $1', [req.params.id])).rows[0].c);
-  if (count === 0) return res.status(400).json({ error: 'Add at least one question before publishing' });
-  await pool.query("UPDATE tests SET status='published' WHERE id=$1", [req.params.id]);
-  res.json({ status: 'published' });
+  try {
+    const count = Number((await pool.query('SELECT COUNT(*) as c FROM test_questions WHERE test_id = $1', [req.params.id])).rows[0].c);
+    if (count === 0) return res.status(400).json({ error: 'Add at least one question before publishing' });
+    await pool.query("UPDATE tests SET status='published' WHERE id=$1", [req.params.id]);
+    res.json({ status: 'published' });
+  } catch (err) { console.error('publish error:', err); res.status(500).json({ error: 'Failed to publish test: ' + err.message }); }
 });
 
 router.put('/tests/:id/unpublish', async (req, res) => {
-  await pool.query("UPDATE tests SET status='draft' WHERE id=$1", [req.params.id]);
-  res.json({ status: 'draft' });
+  try {
+    await pool.query("UPDATE tests SET status='draft' WHERE id=$1", [req.params.id]);
+    res.json({ status: 'draft' });
+  } catch (err) { console.error('unpublish error:', err); res.status(500).json({ error: 'Failed to unpublish test: ' + err.message }); }
 });
 
 router.post('/tests/:id/questions', async (req, res) => {
