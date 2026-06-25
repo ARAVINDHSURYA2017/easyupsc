@@ -1,0 +1,10 @@
+node_modules/
+client/node_modules/
+server/node_modules/
+client/dist/
+server/uploads/
+.env
+deploy.js
+frontend_deploy.zip
+server_deploy.zip
+htaccess_live.txt
